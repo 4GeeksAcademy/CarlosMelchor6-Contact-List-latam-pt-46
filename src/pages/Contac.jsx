@@ -1,15 +1,23 @@
 import React, { useEffect } from "react";
 import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
-import { getContacts } from "../services/getContacts.js";
+import { getContacts, deleteUser } from "../services/fetchApi.js";
 
 export const Contact = () => {
 
 	const { store, dispatch } = useGlobalReducer()
-	console.log(store.contacts);
 
 	const handleContacts = async () => {
 		const contacts = await getContacts()
-		dispatch({ type: "get_contacts", payload: { contacts: contacts } })
+		dispatch({ type: "update_contacts", payload: { contacts: contacts} })
+	}
+
+	const deleteContacts = async () => {
+		const deleted = await deleteUser()
+		if (deleted) {
+			dispatch({ type: "update_contacts", payload: { contacts: []} })
+		} else {
+			alert("Hubo un error al eliminar los contactos")
+		}
 	}
 
 	useEffect(() => {
@@ -19,6 +27,15 @@ export const Contact = () => {
 	return (
 		<div className="container mt-5">
 			<div className="row">
+
+				<button
+					type="button"
+					className="col-5 mx-auto btn btn-danger mb-2"
+					onClick={deleteContacts}
+				>
+					Eliminar todos los contactos
+				</button>
+				
 				<div className="col-9 mx-auto">
 					<div className="card" >
 						<ul className="list-group list-group-flush">
@@ -34,6 +51,7 @@ export const Contact = () => {
 														src={`https://avatar.iran.liara.run/public/${item.id}`}
 													/>
 												</div>
+
 												<div>
 													<p className="fs-5">
 														{item.name}
@@ -44,16 +62,18 @@ export const Contact = () => {
 														{item.phone}
 													</p>
 												</div>
+
 											</div>
+
 											<div className="d-flex gap-4">
 												<i className="fa-solid fa-trash"></i>
 												<i className="fa-solid fa-pen"></i>
 											</div>
+
 										</div>
 									</li>
 								)
-							})
-							}
+							})}
 						</ul>
 					</div>
 				</div>
