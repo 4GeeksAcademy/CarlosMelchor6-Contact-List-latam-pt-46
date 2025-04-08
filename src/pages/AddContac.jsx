@@ -1,21 +1,34 @@
 // Import necessary components from react-router-dom and other parts of the application.
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import useGlobalReducer from "../hooks/useGlobalReducer";  // Custom hook for accessing the global state.
 import { createContac, getContacts } from "../services/fetchApi.js";
 import React, { useState } from "react";
-import { object } from "prop-types";
+import { use } from "react";
+
 
 export const AddContac = () => {
   // Access the global state and dispatch function using the useGlobalReducer hook.
   const { store, dispatch } = useGlobalReducer()
-
+  const [error, setError] = useState(null)
   const [formData, setFormData] = useState({ name: "", email: "", phone: "", address: "" })
+  const navigate = useNavigate()
+
 
   const addContact = async () => {
+
+    if (!formData.name || !formData.email || !formData.phone || !formData.address) {
+      setError("Please fill out all fields.")
+      return;
+    }
+
     const created = await createContac(formData)
     if (created) {
       const contacts = await getContacts();
-      dispatch({ type: "update_contacts", payload: { contacts: contacts } })
+      dispatch({ type: "update_contacts", payload: { contacts } })
+
+      navigate("/")
+      setError(null)
+      alert("Usuario creado con éxito")
     }
   }
 
@@ -56,7 +69,7 @@ export const AddContac = () => {
         <div className="col-12 mb-3">
           <label htmlFor="inputPhone" className="form-label">Phone</label>
           <input
-            type="num"
+            type="number"
             className="form-control"
             id="inputPhone"
             placeholder="Enter phone"
@@ -83,14 +96,15 @@ export const AddContac = () => {
 
         <br />
 
-        <Link to="/">
+        <div>
+          {error && <div className="alert alert-danger">{error}</div>}
           <button
             className="col-12 btn btn-primary"
             onClick={addContact}
           >
             Save
           </button>
-        </Link>
+        </div>
 
         <Link to="/">
           <p>or get back to contacts</p>

@@ -33,7 +33,7 @@ export const Contact = () => {
 					className="col-5 mx-auto btn btn-danger mb-2"
 					onClick={deleteContacts}
 				>
-					Eliminar todos los contactos
+					Delete all users
 				</button>
 				
 				<div className="col-9 mx-auto">
