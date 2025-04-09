@@ -7,7 +7,7 @@ export const Navbar = () => {
 			<div className="container justify-content-end">
 				<div className="row">
 
-					<Link to="/demo">
+					<Link to="/AddContact">
 						<button className="btn btn-success">Add new contact</button>
 					</Link>
 
