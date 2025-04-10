@@ -1,44 +1,65 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
 import { getContacts, putContact } from "../services/fetchApi.js";
 import React, { useState } from "react";
+import { useEffect } from "react";
 
 export const EditContact = () => {
+  const { id } = useParams();
+  const contactId = parseInt(id);
   const { store, dispatch } = useGlobalReducer();
   const [error, setError] = useState(null);
-  const [formData, setFormData] = useState({
+  const [contacData, setcontacData] = useState({
     name: "",
     email: "",
     phone: "",
     address: "",
   });
+
+  useEffect(() => {
+    const contactToEdit = store.contacts.find((c) => c.id === contactId);
+    if (contactToEdit) {
+      setcontacData({
+        name: contactToEdit.name,
+        email: contactToEdit.email,
+        phone: contactToEdit.phone,
+        address: contactToEdit.address,
+      });
+    }
+  }, [id, store.contacts]);
+
   const navigate = useNavigate();
 
-  const EditContact = async () => {
+  const editContact = async () => {
     if (
-      !formData.name ||
-      !formData.email ||
-      !formData.phone ||
-      !formData.address
+      !contacData.name ||
+      !contacData.email ||
+      !contacData.phone ||
+      !contacData.address
     ) {
       setError("Please fill out all fields.");
       return;
     }
 
-    const created = await putContact(formData);
-    if (created) {
-      const contacts = await getContacts();
-      dispatch({ type: "update_contacts", payload: { contacts } });
-
+    const updated = await putContact(contactId, contacData);
+    if (updated) {
+      const contact = await getContacts();
+      dispatch({
+        type: "edit_contacts",
+        payload: { contact: contacData, id: contactId },
+      });
       navigate("/");
       setError(null);
-      alert("Successfully edit user");
+      alert("Successfully created user");
     }
   };
 
   return (
     <div className="container">
       <div className="row">
+        <div className="col-12 d-flex justify-content-center my-3">
+          <h1>Edit a new contact</h1>
+        </div>
         <div className="col-12 mb-3">
           <label htmlFor="inputFullName" className="form-label">
             Full Name
@@ -48,9 +69,9 @@ export const EditContact = () => {
             className="form-control"
             id="inputFullName"
             placeholder="Full Name"
-            value={formData.name}
+            value={contacData.name}
             onChange={(e) => {
-              setFormData({ ...formData, name: e.target.value });
+              setcontacData({ ...contacData, name: e.target.value });
             }}
           />
         </div>
@@ -64,9 +85,9 @@ export const EditContact = () => {
             className="form-control"
             id="inputEmail"
             placeholder="Enter email"
-            value={formData.email}
+            value={contacData.email}
             onChange={(e) => {
-              setFormData({ ...formData, email: e.target.value });
+              setcontacData({ ...contacData, email: e.target.value });
             }}
           />
         </div>
@@ -80,9 +101,9 @@ export const EditContact = () => {
             className="form-control"
             id="inputPhone"
             placeholder="Enter phone"
-            value={formData.phone}
+            value={contacData.phone}
             onChange={(e) => {
-              setFormData({ ...formData, phone: e.target.value });
+              setcontacData({ ...contacData, phone: e.target.value });
             }}
           />
         </div>
@@ -96,18 +117,18 @@ export const EditContact = () => {
             className="form-control"
             id="inputAddress"
             placeholder="Enter address"
-            value={formData.address}
+            value={contacData.address}
             onChange={(e) => {
-              setFormData({ ...formData, address: e.target.value });
+              setcontacData({ ...contacData, address: e.target.value });
             }}
           />
         </div>
 
         <br />
 
+        {error && <div className="alert alert-danger">{error}</div>}
         <div>
-          {error && <div className="alert alert-danger">{error}</div>}
-          <button className="col-12 btn btn-primary" onClick={EditContact}>
+          <button className="col-12 btn btn-primary" onClick={editContact}>
             Save
           </button>
         </div>

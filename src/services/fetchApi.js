@@ -131,7 +131,7 @@ export const deleteContact = async (id) => {
   }
 };
 
-export const putContact = async (id, contact) => {
+export const putContact = async (id, contacData) => {
   try {
     const response = await fetch(
       `${API_URL}/contact/agendas/${agendaOfUser}/contacts/${id}`,
@@ -140,12 +140,14 @@ export const putContact = async (id, contact) => {
         headers: {
           "Content-type": "application/json",
         },
-        body: JSON.stringify(contact),
+        body: JSON.stringify(contacData),
       }
     );
 
+    const data = await response.json();
+
     if (!response.ok) {
-      console.log("Hubo un error al editar usuario: ", response.status);
+      console.log("Hubo un error al editar usuario: ", response.status, data);
       return false;
     }
 

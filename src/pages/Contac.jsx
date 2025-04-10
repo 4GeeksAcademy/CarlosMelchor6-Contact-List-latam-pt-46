@@ -47,13 +47,23 @@ export const Contact = () => {
   return (
     <div className="container mt-5">
       <div className="row">
-        <button
-          type="button"
-          className="col-5 mx-auto btn btn-danger mb-2"
-          onClick={deleteContacts}
-        >
-          Delete all users
-        </button>
+        <div className="col-12 mb-3 d-flex justify-content-center ">
+          <div className="w-75">
+            <Link to="/AddContact">
+              <button className="btn btn-success w-100">Add new contact</button>
+            </Link>
+          </div>
+        </div>
+
+        <div className="col-12 d-flex justify-content-center">
+          <button
+            type="button"
+            className="btn btn-danger mb-3 w-75 "
+            onClick={deleteContacts}
+          >
+            Delete all users
+          </button>
+        </div>
 
         <div className="col-9 mx-auto">
           <div className="card">
@@ -129,6 +139,7 @@ export const Contact = () => {
                                 >
                                   OH no!
                                 </button>
+
                                 <div>
                                   <button
                                     type="button"

@@ -15,11 +15,23 @@ export default function storeReducer(store, action = {}) {
       };
 
     case "delete_contact":
-      const { id } = action.payload;
+      const { id: deleteById } = action.payload;
 
       return {
         ...store,
-        contacts: store.contacts.filter((contact) => contact.id !== id),
+        contacts: store.contacts.filter((contact) => contact.id !== deleteById),
+      };
+
+    case "edit_contacts":
+      const { contact, id } = action.payload;
+
+      const updateContacts = store.contacts.map((cont) =>
+        cont.id === id ? { ...cont, ...contact } : cont
+      );
+
+      return {
+        ...store,
+        contacts: updateContacts,
       };
 
     default:

@@ -41,6 +41,9 @@ export const AddContact = () => {
   return (
     <div className="container">
       <div className="row">
+        <div className="col-12 d-flex justify-content-center my-3">
+          <h1>Add a new contact</h1>
+        </div>
         <div className="col-12 mb-3">
           <label htmlFor="inputFullName" className="form-label">
             Full Name
