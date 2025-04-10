@@ -3,23 +3,52 @@ import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
 import { getContacts, putContact } from "../services/fetchApi.js";
 import React, { useState } from "react";
 import { useEffect } from "react";
+import { ContactForm } from "../components/ContactForm.jsx";
 
 export const EditContact = () => {
   const { id } = useParams();
   const contactId = parseInt(id);
   const { store, dispatch } = useGlobalReducer();
   const [error, setError] = useState(null);
-  const [contacData, setcontacData] = useState({
+  const navigate = useNavigate();
+  const [contactData, setContactData] = useState({
     name: "",
     email: "",
     phone: "",
     address: "",
   });
 
+  const handleChange = (field, value) => {
+    setContactData({ ...contactData, [field]: value });
+  };
+
+  const handleSubmit = async () => {
+    if (
+      !contactData.name ||
+      !contactData.email ||
+      !contactData.phone ||
+      !contactData.address
+    ) {
+      setError("Please fill out all fields.");
+      return;
+    }
+
+    const updated = await putContact(contactId, contactData);
+    if (updated) {
+      dispatch({
+        type: "edit_contacts",
+        payload: { contact: contactData, id: contactId },
+      });
+      navigate("/");
+      setError(null);
+      alert("Successfully created user");
+    }
+  };
+
   useEffect(() => {
-    const contactToEdit = store.contacts.find((c) => c.id === contactId);
+    const contactToEdit = store.contacts.find((contact) => contact.id === contactId);
     if (contactToEdit) {
-      setcontacData({
+      setContactData({
         name: contactToEdit.name,
         email: contactToEdit.email,
         phone: contactToEdit.phone,
@@ -28,115 +57,14 @@ export const EditContact = () => {
     }
   }, [id, store.contacts]);
 
-  const navigate = useNavigate();
-
-  const editContact = async () => {
-    if (
-      !contacData.name ||
-      !contacData.email ||
-      !contacData.phone ||
-      !contacData.address
-    ) {
-      setError("Please fill out all fields.");
-      return;
-    }
-
-    const updated = await putContact(contactId, contacData);
-    if (updated) {
-      const contact = await getContacts();
-      dispatch({
-        type: "edit_contacts",
-        payload: { contact: contacData, id: contactId },
-      });
-      navigate("/");
-      setError(null);
-      alert("Successfully created user");
-    }
-  };
-
   return (
-    <div className="container">
-      <div className="row">
-        <div className="col-12 d-flex justify-content-center my-3">
-          <h1>Edit a new contact</h1>
-        </div>
-        <div className="col-12 mb-3">
-          <label htmlFor="inputFullName" className="form-label">
-            Full Name
-          </label>
-          <input
-            type="text"
-            className="form-control"
-            id="inputFullName"
-            placeholder="Full Name"
-            value={contacData.name}
-            onChange={(e) => {
-              setcontacData({ ...contacData, name: e.target.value });
-            }}
-          />
-        </div>
-
-        <div className="col-12 mb-3">
-          <label htmlFor="inputEmail" className="form-label">
-            Email
-          </label>
-          <input
-            type="email"
-            className="form-control"
-            id="inputEmail"
-            placeholder="Enter email"
-            value={contacData.email}
-            onChange={(e) => {
-              setcontacData({ ...contacData, email: e.target.value });
-            }}
-          />
-        </div>
-
-        <div className="col-12 mb-3">
-          <label htmlFor="inputPhone" className="form-label">
-            Phone
-          </label>
-          <input
-            type="number"
-            className="form-control"
-            id="inputPhone"
-            placeholder="Enter phone"
-            value={contacData.phone}
-            onChange={(e) => {
-              setcontacData({ ...contacData, phone: e.target.value });
-            }}
-          />
-        </div>
-
-        <div className="col-12 mb-3">
-          <label htmlFor="inputAddress" className="form-label">
-            Address
-          </label>
-          <input
-            type="text"
-            className="form-control"
-            id="inputAddress"
-            placeholder="Enter address"
-            value={contacData.address}
-            onChange={(e) => {
-              setcontacData({ ...contacData, address: e.target.value });
-            }}
-          />
-        </div>
-
-        <br />
-
-        {error && <div className="alert alert-danger">{error}</div>}
-        <div>
-          <button className="col-12 btn btn-primary" onClick={editContact}>
-            Save
-          </button>
-        </div>
-
-        <Link to="/">
-          <p>or get back to contacts</p>
-        </Link>
-      </div>
-    </div>
+    <ContactForm
+      title="Edit Contact"
+      formData={contactData}
+      onChange={handleChange}
+      onSubmit={handleSubmit}
+      error={error}
+      buttonText="Save"
+    />
   );
 };
